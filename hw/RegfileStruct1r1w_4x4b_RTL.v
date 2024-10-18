@@ -44,17 +44,6 @@ module RegfileStruct1r1w_4x4b_RTL
      // Instantate a 4-bit register and connect appropriately
      //>''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-      Register_RTL#(4) register
-      (
-        .clk (clk),
-        .rst (rst),
-        .en  (regfile_en[i] & wen),
-        .d   (wdata),
-        .q   (regfile_q[i])
-      );
-
-      //<'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-
     end
   endgenerate
 

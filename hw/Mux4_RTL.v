@@ -21,18 +21,6 @@ module Mux4_RTL
   // Implement a parameterized 4-to-1 mux using a case statement
   //>'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-  always_comb begin
-    case ( sel )
-      0       : out = in0;
-      1       : out = in1;
-      2       : out = in2;
-      3       : out = in3;
-      default : out = 'x;
-    endcase
-  end
-
-  //<'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-
 endmodule
 
 `endif /* MUX4_RTL */

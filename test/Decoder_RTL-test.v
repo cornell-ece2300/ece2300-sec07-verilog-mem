@@ -181,22 +181,6 @@ module Top();
   // Add test suites for 8-bit and 16-bit decoders
   //>'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-  TestDecoder
-  #(
-    .p_test_suite(1),
-    .p_nbits(8)
-  )
-  test_decoder_nbits_8();
-
-  TestDecoder
-  #(
-    .p_test_suite(1),
-    .p_nbits(16)
-  )
-  test_decoder_nbits_16();
-
-  //<'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-
   //----------------------------------------------------------------------
   // main
   //----------------------------------------------------------------------
@@ -209,11 +193,6 @@ module Top();
     //''' ACTIVITY '''''''''''''''''''''''''''''''''''''''''''''''''''''''
     // Use run_test_suite with your new test suites here
     //>'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-
-    test_decoder_nbits_8.run_test_suite ( t.test_suite, t.test_case );
-    test_decoder_nbits_16.run_test_suite( t.test_suite, t.test_case );
-
-    //<'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
     t.test_bench_end();
   end

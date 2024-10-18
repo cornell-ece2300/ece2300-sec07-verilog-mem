@@ -32,28 +32,6 @@ module RegfileFlat1r1w_4x4b_RTL
   // Write ports are sequential and should be implemented in a single
   // always_ff block, while read ports are combinational and should be
   // implemented in a separate always_comb block.
-  //>'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-
-  // Sequential write port
-
-  always_ff @( posedge clk ) begin
-    if ( rst ) begin
-      regfile[0] <= 0;
-      regfile[1] <= 0;
-      regfile[2] <= 0;
-      regfile[3] <= 0;
-    end
-    else if ( wen )
-      regfile[waddr] <= wdata;
-  end
-
-  // Combinational read port
-
-  always_comb begin
-    rdata = regfile[raddr];
-  end
-
-  //<'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 endmodule
 

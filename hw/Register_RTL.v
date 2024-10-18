@@ -20,15 +20,6 @@ module Register_RTL
   // Implement a parameterized register using an always_ff
   //>'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-  always_ff @(posedge clk) begin
-    if ( rst )
-      q <= 0;
-    else if ( en )
-      q <= d;
-  end
-
-  //<'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-
 endmodule
 
 `endif /* REGISTER_RTL_V */

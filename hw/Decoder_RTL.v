@@ -19,13 +19,6 @@ module Decoder_RTL
   // Assume p_nbits is always an even power of two
   //>'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-  always_comb begin
-    out = 0;
-    out[in] = 1;
-  end
-
-  //<'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-
 endmodule
 
 `endif /* DECODER2To4_RTL */

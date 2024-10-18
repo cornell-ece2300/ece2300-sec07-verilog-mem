@@ -308,22 +308,6 @@ module Top();
   // Add test suites for 5-bit and 32-bit registers
   //>'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-  TestRegister
-  #(
-    .p_test_suite(1),
-    .p_nbits(5)
-  )
-  test_register_nbits_5();
-
-  TestRegister
-  #(
-    .p_test_suite(1),
-    .p_nbits(32)
-  )
-  test_register_nbits_32();
-
-  //<'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-
   //----------------------------------------------------------------------
   // main
   //----------------------------------------------------------------------
@@ -336,11 +320,6 @@ module Top();
     //''' ACTIVITY '''''''''''''''''''''''''''''''''''''''''''''''''''''''
     // Use run_test_suite with your new test suites here
     //>'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-
-    test_register_nbits_5.run_test_suite ( t.test_suite, t.test_case );
-    test_register_nbits_32.run_test_suite( t.test_suite, t.test_case );
-
-    //<'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
     t.test_bench_end();
   end
