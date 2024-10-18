@@ -327,7 +327,7 @@ module Top();
 
     test_register_nbits_1.run_test_suite ( t.test_suite, t.test_case );
     test_register_nbits_5.run_test_suite ( t.test_suite, t.test_case );
-    test_register_nbits_14.run_test_suite( t.test_suite, t.test_case );
+    test_register_nbits_13.run_test_suite( t.test_suite, t.test_case );
 
     t.test_bench_end();
   end
