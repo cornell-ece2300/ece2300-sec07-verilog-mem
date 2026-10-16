@@ -18,21 +18,11 @@ module Register_4b_RTL
   //''' LAB ASSIGNMENT '''''''''''''''''''''''''''''''''''''''''''''''''''
   // Implement a register using an always_ff
   //>'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-  //:
-  //: `ECE2300_UNUSED( clk );
-  //: `ECE2300_UNUSED( en );
-  //: `ECE2300_UNUSED( d );
-  //: `ECE2300_FLOATING( q );
-  //:
 
-  always_ff @(posedge clk) begin
-    if ( en )
-      q <= d;
-    else if ( !en )
-      q <= q;
-    else
-      q <= 'x;
-  end
+  `ECE2300_UNUSED( clk );
+  `ECE2300_UNUSED( en );
+  `ECE2300_UNUSED( d );
+  `ECE2300_FLOATING( q );
 
 endmodule
 

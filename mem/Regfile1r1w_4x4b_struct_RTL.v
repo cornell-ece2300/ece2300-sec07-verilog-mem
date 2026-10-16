@@ -26,92 +26,13 @@ module Regfile1r1w_4x4b_struct_RTL
   //''' LAB ASSIGNMENT '''''''''''''''''''''''''''''''''''''''''''''''''''
   // Implement 4-element, 4-bit regfile structurally
   //>'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-  //:
-  //: `ECE2300_UNUSED( clk );
-  //: `ECE2300_UNUSED( wen );
-  //: `ECE2300_UNUSED( waddr );
-  //: `ECE2300_UNUSED( wdata );
-  //: `ECE2300_UNUSED( rdata );
-  //: `ECE2300_FLOATING( rdata );
-  //:
 
-  // Write Address Decoder
-
-  logic [3:0] regfile_en;
-
-  Decoder_2b_RTL waddr_decoder
-  (
-    .in  (waddr),
-    .out (regfile_en)
-  );
-
-  // Read data for each register
-
-  logic [3:0] reg_q[4];
-
-  // Register 0
-
-  wire reg0_en;
-  and( reg0_en, regfile_en[0], wen );
-
-  Register_4b_RTL reg0
-  (
-    .clk (clk),
-    .en  (reg0_en),
-    .d   (wdata),
-    .q   (reg_q[0])
-  );
-
-  // Register 1
-
-  wire reg1_en;
-  and( reg1_en, regfile_en[1], wen );
-
-  Register_4b_RTL reg1
-  (
-    .clk (clk),
-    .en  (reg1_en),
-    .d   (wdata),
-    .q   (reg_q[1])
-  );
-
-  // Register 2
-
-  wire reg2_en;
-  and( reg2_en, regfile_en[2], wen );
-
-  Register_4b_RTL reg2
-  (
-    .clk (clk),
-    .en  (reg2_en),
-    .d   (wdata),
-    .q   (reg_q[2])
-  );
-
-  // Register 3
-
-  wire reg3_en;
-  and( reg3_en, regfile_en[3], wen );
-
-  Register_4b_RTL reg3
-  (
-    .clk (clk),
-    .en  (reg3_en),
-    .d   (wdata),
-    .q   (reg_q[3])
-  );
-
-  // Read mux
-
-  Mux4_4b_RTL mux
-  (
-    .in0 (reg_q[0]),
-    .in1 (reg_q[1]),
-    .in2 (reg_q[2]),
-    .in3 (reg_q[3]),
-    .sel (raddr),
-    .out (rdata)
-  );
+  `ECE2300_UNUSED( clk );
+  `ECE2300_UNUSED( wen );
+  `ECE2300_UNUSED( waddr );
+  `ECE2300_UNUSED( wdata );
+  `ECE2300_UNUSED( raddr );
+  `ECE2300_FLOATING( rdata );
 
 endmodule
 
