@@ -113,51 +113,8 @@ rulesets:
     - restrict-gate-primitives
 
 files:
-  # Lab 1
-  lab1/BinaryToBinCodedDec_GL.v:       GL
-  lab1/BinaryToSevenSegOpt_GL.v:       GL
-  lab1/BinaryToSevenSegUnopt_GL.v:     GL
-  lab1/DisplayOpt_GL.v:                GL_Struct_No_Gates
-  lab1/DisplayUnopt_GL.v:              GL_Struct_No_Gates
-
-  # Lab 2
-  lab2/FullAdder_GL.v:                 GL
-  lab2/Mux2_1b_GL.v:                   GL
-  lab2/Multiplier_1x16b_GL.v:          GL
-  lab2/AdderRippleCarry_8b_GL.v:       GL_Struct_No_Gates
-  lab2/AdderRippleCarry_16b_GL.v:      GL_Struct_No_Gates
-  lab2/Mux2_8b_GL.v:                   GL_Struct_No_Gates
-  lab2/Mux2_16b_GL.v:                  GL_Struct_No_Gates
-  lab2/AdderCarrySelect_16b_GL.v:      GL_Struct_No_Gates
-  lab2/Multiplier_2x16b_GL.v:          GL_Struct_No_Gates
-  lab2/Calculator_GL.v:                GL_Struct_No_Gates
-  lab2/Adder_16b_RTL.v:                RTL_No_Always
-  lab2/Multiplier_2x16b_RTL.v:         RTL_No_Always
-
-  # Lab 3
-  lab3/DLatch_GL.v:                    GL
-  lab3/DFF_GL.v:                       GL_Struct
-  lab3/DFFR_GL.v:                      GL_Struct
-  lab3/DFFRE_GL.v:                     GL_Struct
-  lab3/Register_16b_GL.v:              GL_Struct_No_Gates
-  lab3/EqComparator_16b_GL.v:          GL
-  lab3/Counter_16b_GL.v:               GL_Struct
-  lab3/NotePlayerCtrl_GL.v:            GL_Struct
-  lab3/NotePlayer_GL.v:                GL_Struct_No_Gates
-
-  lab3/DFF_RTL.v:                      RTL_Sequential
-  lab3/DFFR_RTL.v:                     RTL_Sequential
-  lab3/DFFRE_RTL.v:                    RTL_Sequential
-  lab3/Register_16b_RTL.v:             RTL_Sequential
-  lab3/EqComparator_16b_RTL.v:         RTL_No_Always
-  lab3/Mux2_16b_RTL.v:                 RTL_No_Always
-  lab3/Mux8_1b_RTL.v:                  RTL_Always_Comb_Case
-
-  lab3/Counter_16b_flat_RTL.v:         RTL_Combinational
-  lab3/Counter_16b_struct_RTL.v:       RTL_Struct_With_Gates
-  lab3/NotePlayerCtrl_RTL.v:           RTL_Control
-  lab3/NotePlayer_RTL.v:               RTL_Struct
-  lab3/MultiNotePlayer_RTL.v:          RTL_Struct_With_Gates
-  lab3/MusicPlayerCtrl_RTL.v:          RTL_Control
-  lab3/MusicPlayerDpath_RTL.v:         RTL_Struct
-  lab3/MusicPlayer_RTL.v:              RTL_Struct
+  mem/Decoder_2b_RTL.v:                RTL_Always_Comb_Case
+  mem/Mux4_4b_RTL.v:                   RTL_Always_Comb_Case
+  mem/Register_4b_RTL.v:               RTL_Sequential
+  mem/Regfile1r1w_4x4b_struct_RTL.v:   RTL_Struct_With_Gates
+  mem/Regfile1r1w_4x4b_flat_RTL.v:     RTL_Sequential
