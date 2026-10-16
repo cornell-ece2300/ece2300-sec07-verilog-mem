@@ -1,154 +1,163 @@
-rule-sets:
-  
+rulesets:
   GL:
-    - Struct
-    - NOMODULE
+    - forbid-special-blocks
+    - forbid-always-comb
+    - forbid-always-ff
+    - restrict-assign-rhs
+    - restrict-gate-primitives
+    - forbid-module-instantiation
+    - restrict-port-connections
+           
+  GL_Struct:
+    - forbid-special-blocks
+    - forbid-always-comb
+    - forbid-always-ff
+    - restrict-assign-rhs
+    - restrict-gate-primitives
+    - restrict-port-connections
 
-  RTL:
-    - InferredLatchRules
-    - XOptimismRules
-    - AlwaysRules
+  GL_Struct_No_Gates:
+    - forbid-special-blocks
+    - forbid-always-comb
+    - forbid-always-ff
+    - restrict-assign-rhs
+    - forbid-gate-primitives
+    - restrict-port-connections
 
-  Struct:
-    - NOSPBLK
-    - BADLHS
-    - BADRHS
-    - COMPLEXLHS
-    - COMPLEXRHS
-    - PRIMONLY
-  # Add a rule to check for concatenation inside the module ports
+  RTL_No_Always:
+    - forbid-special-blocks
+    - forbid-always-comb
+    - forbid-always-ff
+    - forbid-module-instantiation
+    - forbid-gate-primitives
+    - forbid-logic-initialization
+    - forbid-nested-ternary
+    - forbid-one-bit-literal-ternary
 
-  InferredLatchRules:
-    - LATCH
-    - CASEINFER
-    - ASSIGNORDER
-  
-  XOptimismRules:
-    - CASEDEFAULT
-    - XASSIGN
-    - SignalAssignInDefault
-    - XPROP
-    - WRONGXPROP
-  
-  AlwaysRules:
-    - ALWAYSSTAR
-    - BLKSEQ
-    - NONBLKCOMBI
-    - ASYNCRESET
-    - NEGEDGE
+  RTL_Sequential:
+    - if-missing-final-else
+    - final-else-x-only
+    - if-x-assignment
+    - forbid-nested-if-statements
+    - forbid-generic-always
+    - always-ff-non-blocking
+    - forbid-async-reset
+    - forbid-always-comb
+    - forbid-negedge
+    - forbid-special-blocks
+    - forbid-gate-primitives
+    - forbid-logic-initialization
+    - forbid-nested-ternary
+    - forbid-one-bit-literal-ternary
+    - forbid-module-instantiation
 
-modules:
+  RTL_Combinational:
+    - forbid-always-comb
+    - forbid-always-ff
+    - forbid-generic-always
+    - forbid-special-blocks
+    - forbid-gate-primitives
+    - forbid-if-statements
+    - forbid-logic-initialization
+    - forbid-nested-ternary
+    - forbid-one-bit-literal-ternary
+    - forbid-module-instantiation-except-registers
 
-  #------------------------------
-  # Lab 1 Modules
-  #------------------------------
+  RTL_Always_Comb_Case:
+    - case-missing-default
+    - default-case-x-only
+    - default-case-signal-coverage
+    - only-case-in-always-comb
+    - forbid-always-ff
+    - forbid-generic-always
+    - always-comb-blocking
+    - forbid-special-blocks
+    - forbid-gate-primitives
+    - forbid-if-statements
+    - forbid-logic-initialization
+    - forbid-ternary
+    - forbid-module-instantiation
 
-  BinaryToBinCodedDec_GL:   GL
-  BinaryToSevenSegOpt_GL:   GL
-  BinaryToSevenSegUnopt_GL: GL
-  DisplayOpt_GL :           Struct
-  DisplayUnopt_GL:          Struct
+  RTL_Control:
+    - case-missing-default
+    - default-case-x-only
+    - default-case-signal-coverage
+    - only-case-in-always-comb
+    - forbid-always-ff
+    - forbid-generic-always
+    - always-comb-blocking
+    - restrict-port-connections
+    - forbid-if-statements
+    - forbid-logic-initialization
+    - forbid-nested-ternary
+    - forbid-one-bit-literal-ternary
+    - forbid-gate-primitives
+    - forbid-module-instantiation-except-registers
 
-  #------------------------------
-  # Lab 2 Modules
-  #------------------------------
+  RTL_Struct:
+    - forbid-always-ff
+    - forbid-always-comb
+    - forbid-special-blocks
+    - restrict-port-connections
+    - forbid-logic-initialization
+    - restrict-assign-rhs
+    - forbid-gate-primitives
 
-  Adder_16b_RTL:           RTL
-  AdderCarrySelect_16b_GL: Struct
-  AdderRippleCarry_8b_GL:  Struct
-  AdderRippleCarry_16b_GL: Struct
-  #BinaryToBinCodedDec_GL  Repeated from Lab 1
-  BinaryToSevenSeg_GL:     GL
-  Calculator_GL:           Struct
-  CalculatorDisplay_GL:    Struct
-  Display_GL:              Struct
-  FullAdder_GL:            GL
-  Multiplier_1x16b_GL:     GL
-  Multiplier_2x16b_GL:     Struct
-  Multiplier_2x16b_RTL:    RTL
-  Mux2_1b_GL:              GL
-  Mux2_8b_GL:              Struct
-  Mux2_16b_GL:             Struct
+  RTL_Struct_With_Gates:
+    - forbid-always-ff
+    - forbid-always-comb
+    - forbid-special-blocks
+    - restrict-port-connections
+    - forbid-logic-initialization
+    - restrict-assign-rhs
+    - restrict-gate-primitives
 
-  #------------------------------
-  # Lab 3 Modules
-  #------------------------------
+files:
+  # Lab 1
+  lab1/BinaryToBinCodedDec_GL.v:       GL
+  lab1/BinaryToSevenSegOpt_GL.v:       GL
+  lab1/BinaryToSevenSegUnopt_GL.v:     GL
+  lab1/DisplayOpt_GL.v:                GL_Struct_No_Gates
+  lab1/DisplayUnopt_GL.v:              GL_Struct_No_Gates
 
-  #AdderCarrySelect_16b_GL: Repeated from Lab 2
-  #AdderRippleCarry_8b_GL:  Repeated from Lab 2
-  #BinaryToBinCodedDec_GL:  Repeated from Lab 1
-  #BinaryToSevenSeg_GL:     Repeated from Lab 2
-  ClockDiv_RTL:             RTL
-  Counter_16b_GL:           Struct
-  Counter_16b_RTL:          RTL
-  DFF_GL:                   Struct
-  DFF_RTL:                  RTL
-  DFFR_GL:                  Struct
-  DFFR_RTL:                 RTL
-  DFFRE_GL:                 Struct
-  DFFRE_RTL:                RTL
-  #Display_GL:              Repeated from Lab 2
-  DLatch_GL:                GL
-  EqComparator_16b_GL:      GL
-  EqComparator_16b_RTL:     RTL
-  #FullAdder_GL:            Repeated from Lab 2
-  MultiNotePlayer_RTL:      Struct
-  MusicMem_RTL:             RTL
-  MusicPlayer_RTL:          Struct
-  MusicPlayerCtrl_RTL:      RTL
-  MusicPlayerDpath_RTL:     Struct
-  #Mux2_1b_GL:              Repeated from Lab 2
-  #Mux2_8b_GL:              Repeated from Lab 2
-  #Mux2_16b_GL              Reoeated from Lab 2
-  Mux2_16b_RTL:             RTL
-  Mux8_1b_RTL:              RTL
-  NotePlayer_GL:            Struct
-  NotePlayer_RTL:           Struct
-  NotePlayerCtrl_GL:        Struct
-  NotePlayerCtrl_RTL:       RTL
-  Register_16b_GL:          Struct
-  Register_16b_RTL:         RTL
+  # Lab 2
+  lab2/FullAdder_GL.v:                 GL
+  lab2/Mux2_1b_GL.v:                   GL
+  lab2/Multiplier_1x16b_GL.v:          GL
+  lab2/AdderRippleCarry_8b_GL.v:       GL_Struct_No_Gates
+  lab2/AdderRippleCarry_16b_GL.v:      GL_Struct_No_Gates
+  lab2/Mux2_8b_GL.v:                   GL_Struct_No_Gates
+  lab2/Mux2_16b_GL.v:                  GL_Struct_No_Gates
+  lab2/AdderCarrySelect_16b_GL.v:      GL_Struct_No_Gates
+  lab2/Multiplier_2x16b_GL.v:          GL_Struct_No_Gates
+  lab2/Calculator_GL.v:                GL_Struct_No_Gates
+  lab2/Adder_16b_RTL.v:                RTL_No_Always
+  lab2/Multiplier_2x16b_RTL.v:         RTL_No_Always
 
-  #------------------------------
-  # Lab 4 Modules
-  #------------------------------
+  # Lab 3
+  lab3/DLatch_GL.v:                    GL
+  lab3/DFF_GL.v:                       GL_Struct
+  lab3/DFFR_GL.v:                      GL_Struct
+  lab3/DFFRE_GL.v:                     GL_Struct
+  lab3/Register_16b_GL.v:              GL_Struct_No_Gates
+  lab3/EqComparator_16b_GL.v:          GL
+  lab3/Counter_16b_GL.v:               GL_Struct
+  lab3/NotePlayerCtrl_GL.v:            GL_Struct
+  lab3/NotePlayer_GL.v:                GL_Struct_No_Gates
 
-  AccumXcel:               Struct
-  AccumXcelCtrl:           RTL
-  AccumXcelDpath:          Struct
-  AccumXcelMem:            RTL
-  Adder_32b_GL:            Struct
-  AdderCarrySelect_8b_GL:  Struct
-  AdderRippleCarry_4b_GL:  Struct
-  ALU_32b:                 Struct
-  #BinaryToBinCodedDec_GL: Repeated from Lab 1
-  #BinaryToSevenSeg_GL:    Repeated from Lab 2
-  Bus_RTL:                 RTL
-  #ClockDiv_RTL:           Repeated from Lab 3
-  #Counter_16b_RTL:        Repeated from Lab 3
-  #Display_GL:             Repeated from Lab 2
-  EqComparator_32b_RTL:    Struct
-  #FullAdder_GL:           Repeated from Lab 2
-  ImmGen_RTL:              RTL
-  Memory:                  RTL
-  MMU:                     RTL
-  Multiplier_32x32b_RTL:   RTL
-  #Mux2_1b_GL:             Repeated from Lab 2
-  Mux2_4b_GL:              Struct
-  Mux2_RTL:                RTL
-  Mux4_RTL:                RTL
-  Mux8_RTL:                RTL
-  ProcScycle:              Struct
-  ProcScycleCtrl:          RTL
-  ProcScycleDpath:         Struct
-  ProcSimple:              Struct
-  ProcSimpleCtrl:          RTL
-  ProcSimpleDpath:         Struct
-  RegfileZ2r1w_32x32b_RTL: RTL
-  Register_RTL:            RTL
+  lab3/DFF_RTL.v:                      RTL_Sequential
+  lab3/DFFR_RTL.v:                     RTL_Sequential
+  lab3/DFFRE_RTL.v:                    RTL_Sequential
+  lab3/Register_16b_RTL.v:             RTL_Sequential
+  lab3/EqComparator_16b_RTL.v:         RTL_No_Always
+  lab3/Mux2_16b_RTL.v:                 RTL_No_Always
+  lab3/Mux8_1b_RTL.v:                  RTL_Always_Comb_Case
 
-  Mux4_4b_RTL:                RTL
-  Decoder_2b_RTL:             RTL
-  Register_4b_RTL:            RTL
-  RegfileStruct1r1w_4x4b_RTL: Struct
-  # RegfileFlat1r1w_4x4b_RTL:   RTL
+  lab3/Counter_16b_flat_RTL.v:         RTL_Combinational
+  lab3/Counter_16b_struct_RTL.v:       RTL_Struct_With_Gates
+  lab3/NotePlayerCtrl_RTL.v:           RTL_Control
+  lab3/NotePlayer_RTL.v:               RTL_Struct
+  lab3/MultiNotePlayer_RTL.v:          RTL_Struct_With_Gates
+  lab3/MusicPlayerCtrl_RTL.v:          RTL_Control
+  lab3/MusicPlayerDpath_RTL.v:         RTL_Struct
+  lab3/MusicPlayer_RTL.v:              RTL_Struct

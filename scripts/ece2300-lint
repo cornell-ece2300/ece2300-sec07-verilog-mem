@@ -1,121 +1,163 @@
 #!/usr/bin/env python3
+"""
+Lint the Verilog files covered by a Verilog top or test file.
 
-import os
+Usage - how the Makefile invokes this script:
+
+    ece2300-lint --rulesets <top_dir>/scripts/lint/rulesets.yaml \
+        -I <top_dir> <test_file>
+
+What happens:
+
+  1. collect_files() walks `include`s to build the list of 
+  hardware files the top covers
+  2. rulesets.yaml says which rules apply to which file
+  3. verible-verilog-lint runs once per file, with that file's rules
+
+A file that is not listed in rulesets.yaml is skipped which is how system
+includes and untracked files don't have Verible linting
+
+Author   : Kaan Akan
+Last Edit: Sep 27, 2026
+"""
+
+import argparse
+import shutil
 import subprocess
 import sys
-import argparse 
-import tempfile
-import shutil
-import json
-from lint.lint_rules import Rules
 from pathlib import Path
-from lint.preprocessor import main as preprocessor_main
-from lint.linter import main as linter_main
 
-def main(args_list=None):
+import yaml
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument('file', nargs='?', help='A Verilog file that you want to lint.')
-    parser.add_argument('-I', '--include_dir', action='append', default=['.'],
-                       help='Directory to search for included files. Can be specified multiple times.')
-    parser.add_argument('-v', '--verbose', action='store_true', help='Verbose error output.')
-    parser.add_argument('-l', '--list-rules', action='store_true', help='List all available rules and exit.')
-    parser.add_argument('-t', '--test', action='store_true', default=False, help='Run tests instead of linting a file.')
+from lint.collect_files import collect_files
 
+def find_verible() -> str:
+    exe = shutil.which("verible-verilog-lint")
+    if not exe:
+        sys.exit("Error: verible-verilog-lint not found on PATH.")
+    return exe
+
+def load_rulesets(path: Path):
+    """
+    Read rulesets.yaml and return (file -> ruleset name, ruleset name -> rules).
+    """
+    with open(path) as f:
+        config = yaml.safe_load(f)
+    return config.get("files") or {}, config.get("rulesets") or {}
+
+
+def lint_file(verible: str, path: Path, rules: list) -> bool:
+    """
+    Run verible on one file. Returns True if it was clean.
+
+    Verible exits 0 when clean and non-zero when it finds violations; its
+    output goes to stdout/stderr, so there is nothing to parse.
+    """
+    result = subprocess.run(
+        [verible, "--ruleset=none", "--rules=" + ",".join(rules), str(path)]
+    )
+    return result.returncode == 0
+
+
+def warn_lint_suppressions(path: Path) -> bool:
+    """
+    Check if Verilator or Verible linting is being suppressed.
+    Return True if no suppressions were found.
+    """
+    found = False
+
+    for line_number, line in enumerate(
+        path.read_text(encoding="utf-8").splitlines(), start=1
+    ):
+
+        if ((line.strip() == "// verilator lint_off UNOPTFLAT") or 
+            (line.strip() == "// verilator lint_off UNUSEDPARAM")):
+            continue
+
+        if ("lint_off" in line) or ("verilog_lint:" in line):
+            print(f"{path}:{line_number}: error: possible lint suppression found",
+                file=sys.stderr)
+            found = True
+
+    return (not found)
+
+def main(args_list=None) -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("file", nargs="?", help="the *-test.v file to lint")
+    parser.add_argument(
+        "-r", "--rulesets", type=Path, metavar="PATH",
+        help="path to the ruleset YAML file",
+    )
+    parser.add_argument(
+        "-I", "--include_dir",
+        type=Path,
+        default=Path("."),
+        help="repository root and directory to search for `include files",
+    )
+    parser.add_argument("-v", "--verbose", action="store_true",
+                        help="also report files that were skipped")
+    parser.add_argument("-l", "--list-rules", action="store_true",
+                        help="list every rule the linter knows about and exit")
     args = parser.parse_args(args_list)
-    
-    #Print the rules if requested
+
+    if not args.list_rules and args.rulesets is None:
+        parser.error("--rulesets is required when linting")
+
+    if args.rulesets is not None and not args.rulesets.is_file():
+        parser.error(f"rulesets file not found: {args.rulesets}")
+
+    verible = find_verible()
+
     if args.list_rules:
-        for name, obj in Rules.__dict__.items():
-            if isinstance(obj, type) and obj.__module__ == Rules.__module__:
-                print(f"{obj.ID}: {obj.name} - {obj.description}")
-        sys.exit(0)
+        subprocess.run([verible, "--help_rules=all"])
+        return 0
 
-    include_files = args.include_dir
-    verbose_flag = args.verbose
-    
     if not args.file:
-        parser.error("the following arguments are required: file (unless using -l/--list-rules)")
+        parser.error("a test file is required (unless using -l/--list-rules)")
 
-    # The primary input file
-    input_filepath = Path(args.file)
+    file_rulesets, rulesets = load_rulesets(args.rulesets)
+    repo_root = args.include_dir.resolve()
+    files = collect_files(Path(args.file), [args.include_dir])
 
-    # Dictionary to hold linting results
-    file_result = {"file": input_filepath, "errors": []}
+    everything_clean = True
 
-    # Check if the input file exists in the provided include directories and takes the first valid path
-    actual_path = next((os.path.join(dir, input_filepath) for dir in include_files if os.path.isfile(os.path.join(dir, input_filepath))), None)
+    for path in files:
 
-    if actual_path is None or not os.path.isfile(actual_path):
-        print(f"Error: The provided path '{input_filepath}' is not a valid file. Please use the correct file path or update include directories.")
-        return
-    
-    if not (str(input_filepath).endswith(".v") or str(input_filepath).endswith(".sv")):
-        print(f"Error: The provided file '{str(input_filepath)}' is not a Verilog file (.v or .sv).")
-        return
+        try:
+            file_key = path.relative_to(repo_root).as_posix()
+        except ValueError:
+            if args.verbose:
+                print(f"skipping {path} (outside repository root)")
+            continue
 
-    # Files we preprocessed and their respective temporary paths
-    processed_paths = []
-    # Dictionary to hold xprop data that was recorded during preprocessing. 
-    # Key : Module, Value : Array of Signals that are the first parameter of the xprop macro
-    xprop_comb_dict = {}
-    xprop_seq_dict = {}
+        ruleset_name = file_rulesets.get(file_key)
 
+        if ruleset_name is None:
+            if args.verbose:
+                print(f"skipping {file_key} (not listed in rulesets.yaml)")
+            continue
 
-    # Get file information for other scripts and create a temporary directory
-    script_directory = Path(__file__).resolve().parent
-    config_dir = script_directory / "tests" / "testrules.yaml" if args.test else script_directory / "lint/rulesets.yaml"
-    temp_dir = tempfile.mkdtemp()
+        rules = rulesets.get(ruleset_name)
+        if rules is None:
+            sys.exit(
+                f"Error: file '{file_key}' maps to ruleset '{ruleset_name}', "
+                f"which is not defined in {args.rulesets.name}."
+            )
 
-    # --- Preprocessor ---
+        if args.verbose:
+            print(f"linting {file_key} as '{ruleset_name}'")
 
-    try:
-        preprocessor_args = [str(actual_path), "--temp-dir", temp_dir] + \
-            sum([["-I", inc_dir] for inc_dir in include_files], [])
-        if verbose_flag:
-            preprocessor_args.append("-v")
-        if args.test:
-            preprocessor_args.append("-t")
-        (processed_paths, xprop_comb_dict, xprop_seq_dict) = preprocessor_main(preprocessor_args)
-    except SystemExit as e:
-        file_result["errors"].append(("Preprocessor", f"Preprocessor exited with code {e.code}"))
-    except Exception as e:
-        file_result["errors"].append(("Preprocessor", f"Error during preprocessor execution: {e}"))
+        # Check for lint_off suppressions
+        if not warn_lint_suppressions(path):
+            everything_clean = False
+            break
 
-    # --- Linter ---
-    try:
-        # Using JSON to pass xprop data to the linter
-        xprop_comb_json_string = json.dumps(xprop_comb_dict)
-        xprop_seq_json_string = json.dumps(xprop_seq_dict)
+        # Stop after a failure, matches Verilator
+        if not lint_file(verible, path, rules):
+            everything_clean = False
+            break
 
-        if processed_paths:
-            linter_args = ["-c", str(config_dir), "-I", temp_dir, "-xc", xprop_comb_json_string, "-xs", xprop_seq_json_string] + \
-                [os.path.join(temp_dir,file) for file in processed_paths]
-            linter_main(linter_args) 
-    except subprocess.CalledProcessError as e:
-        file_result["errors"].append(("Linter", e.stderr and e.stdout))
-    except FileNotFoundError as e:
-        file_result["errors"].append(("Linter", f"Error: {e}"))
+    return 0 if everything_clean else 1
 
-    # This is most likely unnecessary as each file will exit with its own error code
-    results = []
-    if file_result["errors"]:
-        results.append(file_result)
-    
-    try:
-        shutil.rmtree(temp_dir)
-    except OSError as e:
-        print(f"Error: {e.strerror}")
-
-    if results:
-        print("\n\n--- Summary of Failures ---")
-        for result in results:
-            print(f"\n\033[1m{result['file']}:\033[0m")
-            for stage, msg in result["errors"]:
-                print(f"\033[91m[{stage} Error]\033[0m")
-                print(msg.strip())
-                print("-" * 60)
-        sys.exit(1)
-    
-if __name__ == '__main__':
-    main()
+if __name__ == "__main__":
+    sys.exit(main())

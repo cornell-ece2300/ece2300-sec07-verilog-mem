@@ -3,8 +3,6 @@
 //========================================================================
 
 `include "ece2300/ece2300-test.v"
-
-// ece2300-lint
 `include "mem/Decoder_2b_RTL.v"
 
 module Top();
@@ -13,7 +11,7 @@ module Top();
   // Setup
   //----------------------------------------------------------------------
 
-  CombinationalTestUtils t();
+  TestUtils t();
 
   //----------------------------------------------------------------------
   // Instantiate design under test
@@ -22,13 +20,17 @@ module Top();
   logic [1:0] in;
   logic [3:0] out;
 
-  Decoder_2b_RTL duta( .* );
+  Decoder_2b_RTL dut
+  (
+    .in  (in),
+    .out (out)
+  );
 
   //----------------------------------------------------------------------
   // check
   //----------------------------------------------------------------------
-  // We set the inputs, wait 8 tau, check the outputs, wait 2 tau. Each
-  // check will take a total of 10 tau.
+  // We wait 1 tau, set the inputs, wait 8 tau, check the outputs, wait 1
+  // tau. Each check will take a total of 10 tau.
 
   task check
   (
@@ -37,6 +39,8 @@ module Top();
   );
     if ( !t.failed ) begin
       t.num_checks += 1;
+
+      #1;
 
       in = in_;
 
@@ -47,7 +51,7 @@ module Top();
 
       `ECE2300_CHECK_EQ( out, out_ );
 
-      #2;
+      #1;
 
     end
   endtask

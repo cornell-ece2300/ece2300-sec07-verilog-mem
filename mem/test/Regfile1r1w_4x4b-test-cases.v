@@ -6,12 +6,12 @@
 //------------------------------------------------------------------------
 // check
 //------------------------------------------------------------------------
-// We set the clock, wait 1 tau, set inputs, wait 8 tau, check the
-// outputs, wait 1 tau. Each check will take a total of 10 tau. The
-// reason we have to set the clock first, then wait, then set the inputs
-// is because in for an RTL implementation we need to avoid a raise
-// between writing the clock and the data. The optional final argument
-// enables ignoring the output checks when they are undefined.
+// The ECE 2300 test framework adds a 1 tau delay with respect to the
+// rising clock edge at the very beginning of the test bench. So if we
+// immediately set the inputs this will take effect 1 tau after the clock
+// edge. Then we wait 8 tau, check the outputs, and wait 2 tau which
+// means the next check will again start 1 tau after the rising clock
+// edge.
 
 task check
 (
@@ -19,8 +19,7 @@ task check
   input logic [1:0] waddr_,
   input logic [3:0] wdata_,
   input logic [1:0] raddr_,
-  input logic [3:0] rdata_,
-  input logic       outputs_undefined = 0
+  input logic [3:0] rdata_
 );
   if ( !t.failed ) begin
     t.num_checks += 1;
@@ -36,8 +35,7 @@ task check
       $display( "%3d: %b %d %h | %d > %h", t.cycles,
                 wen, waddr, wdata, raddr, rdata );
 
-    if ( !outputs_undefined )
-      `ECE2300_CHECK_EQ( rdata, rdata_ );
+    `ECE2300_CHECK_EQ( rdata, rdata_ );
 
     #2;
 
@@ -52,7 +50,7 @@ task test_case_1_basic();
   t.test_case_begin( "test_case_1_basic" );
 
   //    wen waddr wdata raddr rdata
-  check( 1, 0,    4'h0, 0,    4'h0, t.outputs_undefined );
+  check( 1, 0,    4'h0, 0,    4'b? );
   check( 1, 0,    4'h1, 0,    4'h0 );
   check( 0, 0,    4'h0, 0,    4'h1 );
 
@@ -67,7 +65,7 @@ task test_case_2_directed_values();
   t.test_case_begin( "test_case_2_directed_values" );
 
   //    wen waddr wdata raddr rdata
-  check( 1, 0,    4'h0, 0,    4'h0, t.outputs_undefined );
+  check( 1, 0,    4'h0, 0,    4'b? );
   check( 1, 0,    4'h1, 0,    4'h0 );
   check( 1, 0,    4'h2, 0,    4'h1 );
   check( 1, 0,    4'h3, 0,    4'h2 );
@@ -100,7 +98,7 @@ task test_case_3_directed_regs();
   t.test_case_begin( "test_case_3_directed_regs" );
 
   //    wen waddr wdata raddr rdata
-  check( 1, 0,    4'ha, 0,    4'h0, t.outputs_undefined );
+  check( 1, 0,    4'ha, 0,    4'b? );
   check( 1, 1,    4'hb, 0,    4'ha );
   check( 1, 2,    4'hc, 0,    4'ha );
   check( 1, 3,    4'hd, 0,    4'ha );
@@ -139,10 +137,10 @@ task test_case_4_random();
 
   // initialize register file with all zeros
 
-  check( 1, 0, 4'h0, 0, 4'h0, t.outputs_undefined );
-  check( 1, 1, 4'h0, 0, 4'h0, t.outputs_undefined );
-  check( 1, 2, 4'h0, 0, 4'h0, t.outputs_undefined );
-  check( 1, 3, 4'h0, 0, 4'h0, t.outputs_undefined );
+  check( 1, 0, 4'h0, 0, 4'b? );
+  check( 1, 1, 4'h0, 0, 4'b? );
+  check( 1, 2, 4'h0, 0, 4'b? );
+  check( 1, 3, 4'h0, 0, 4'b? );
 
   // random test loop
 

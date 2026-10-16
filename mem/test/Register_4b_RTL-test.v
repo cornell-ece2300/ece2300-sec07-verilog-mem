@@ -4,8 +4,6 @@
 
 `include "ece2300/ece2300-misc.v"
 `include "ece2300/ece2300-test.v"
-
-// ece2300-lint
 `include "mem/Register_4b_RTL.v"
 
 module Top();
@@ -17,7 +15,11 @@ module Top();
   logic clk;
   logic rst;
 
-  TestUtilsClkRst t( .* );
+  TestUtilsClkRst t
+  (
+    .clk (clk),
+    .rst (rst)
+  );
 
   `ECE2300_UNUSED( rst );
 
@@ -29,7 +31,13 @@ module Top();
   logic [3:0] d;
   logic [3:0] q;
 
-  Register_4b_RTL register( .* );
+  Register_4b_RTL register
+  (
+    .clk (clk),
+    .en (en),
+    .d  (d),
+    .q  (q)
+  );
 
   //----------------------------------------------------------------------
   // check
@@ -45,8 +53,7 @@ module Top();
   (
     input logic       en_,
     input logic [3:0] d_,
-    input logic [3:0] q_,
-    input logic       outputs_undefined = 0
+    input logic [3:0] q_
   );
     if ( !t.failed ) begin
       t.num_checks += 1;
@@ -59,8 +66,7 @@ module Top();
       if ( t.n != 0 )
         $display( "%3d: %b %h > %h", t.cycles, en, d, q );
 
-      if ( !outputs_undefined )
-        `ECE2300_CHECK_EQ( q, q_ );
+      `ECE2300_CHECK_EQ( q, q_ );
 
       #2;
 
@@ -75,7 +81,7 @@ module Top();
     t.test_case_begin( "test_case_1_basic" );
 
     //     en d        q
-    check( 1, 4'b0000, 4'b0000, t.outputs_undefined );
+    check( 1, 4'b0000, 4'b???? );
     check( 1, 4'b0001, 4'b0000 );
     check( 1, 4'b0000, 4'b0001 );
     check( 1, 4'b0010, 4'b0000 );
@@ -93,7 +99,7 @@ module Top();
     t.test_case_begin( "test_case_2_directed_ones" );
 
     //     en d        q
-    check( 1, 4'b0000, 4'b0000, t.outputs_undefined );
+    check( 1, 4'b0000, 4'b???? );
     check( 1, 4'b0001, 4'b0000 );
     check( 1, 4'b0010, 4'b0001 );
     check( 1, 4'b0100, 4'b0010 );
@@ -112,7 +118,7 @@ module Top();
     t.test_case_begin( "test_case_3_directed_values" );
 
     //     en d        q
-    check( 1, 4'b0000, 4'b0000, t.outputs_undefined );
+    check( 1, 4'b0000, 4'b???? );
     check( 1, 4'b0101, 4'b0000 );
     check( 1, 4'b1010, 4'b0101 );
     check( 1, 4'b1111, 4'b1010 );
@@ -133,7 +139,7 @@ module Top();
     t.test_case_begin( "test_case_4_directed_enable" );
 
     //     en d        q
-    check( 1, 4'b0000, 4'b0000, t.outputs_undefined );
+    check( 1, 4'b0000, 4'b???? );
     check( 1, 4'b0000, 4'b0000 ); // en=1
     check( 1, 4'b0011, 4'b0000 );
     check( 1, 4'b1100, 4'b0011 );
@@ -157,7 +163,7 @@ module Top();
     t.test_case_begin( "test_case_5_xprop" );
 
     //     en  d   q
-    check( 'x, 'x, 'x, t.outputs_undefined );
+    check( 'x, 'x, 4'b? );
     check( 'x, 'x, 'x );
     check( 'x, 'x, 'x );
     check( 'x, 'x, 'x );

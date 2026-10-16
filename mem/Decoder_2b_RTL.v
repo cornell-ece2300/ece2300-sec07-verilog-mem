@@ -16,9 +16,20 @@ module Decoder_2b_RTL
   //''' ACTIVITY '''''''''''''''''''''''''''''''''''''''''''''''''''''''''
   // Implement a 2-to-4 decoder using an always_comb block
   //>'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+  //:
+  //: `ECE2300_UNUSED( in );
+  //: `ECE2300_FLOATING( out );
+  //:
 
-  `ECE2300_UNUSED( in );
-  `ECE2300_UNDRIVEN( out );
+  always_comb begin
+    case ( in )
+      2'd0   : out = 4'b0001;
+      2'd1   : out = 4'b0010;
+      2'd2   : out = 4'b0100;
+      2'd3   : out = 4'b1000;
+      default: out = 'x;
+    endcase
+  end
 
 endmodule
 

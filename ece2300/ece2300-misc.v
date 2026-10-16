@@ -47,7 +47,7 @@
 `endif
 
 //------------------------------------------------------------------------
-// ECE2300_UNDRIVEN
+// ECE2300_FLOATING
 //------------------------------------------------------------------------
 // We use the $bits system task to get the bitwidth of the signal so we
 // can use the repeat operator to create a literal with all Zs. Unlike
@@ -57,64 +57,8 @@
 // does not have a trailing semicolon. The semicolon after the actual
 // macro call will turn into the semicolon at the end of the assign.
 
-`define ECE2300_UNDRIVEN( signal_ ) \
+`define ECE2300_FLOATING( signal_ ) \
   assign signal_ = {$bits(signal_){1'bz}}
-
-//------------------------------------------------------------------------
-// ECE2300_XPROP
-//------------------------------------------------------------------------
-// This macro enables forcing a signal to be 'x to avoid X-optimism in
-// combinational logic. You can use it in an always_comb block like this:
-//
-//  always_comb begin
-//
-//    a = 'x;
-//
-//    if ( b )
-//      a = c;
-//
-//    `ECE2300_XPROP( a, $isunknown(b) );
-//
-//  end
-//
-
-`ifndef ALTERA_RESERVED_QIS
-`define ECE2300_XPROP( signal_, expression_ ) \
-  if ( expression_ ) \
-    signal_ = 'x; \
-  if (0)
-`else
-`define ECE2300_XPROP( signal_, expression_ ) \
-  if (0)
-`endif
-
-//------------------------------------------------------------------------
-// ECE2300_SEQ_XPROP
-//------------------------------------------------------------------------
-// This macro enables forcing a signal to be 'x to avoid X-optimism in
-// combinational logic. You can use it in an always_comb block like this:
-//
-//  always_ff @( posedge clk ) begin
-//
-//    if ( rst )
-//      q <= 1'b0;
-//    else
-//      q <= d;
-//
-//    `ECE2300_SEQ_XPROP( q, $isunknown(rst) );
-//
-//  end
-//
-
-`ifndef ALTERA_RESERVED_QIS
-`define ECE2300_SEQ_XPROP( signal_, expression_ ) \
-  if ( expression_ ) \
-    signal_ <= 'x; \
-  if (0)
-`else
-`define ECE2300_SEQ_XPROP( signal_, expression_ ) \
-  if (0)
-`endif
 
 `endif /* ECE2300_MISC */
 

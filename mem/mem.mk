@@ -13,7 +13,7 @@ mem_tests = \
   Mux4_4b_RTL-test.v \
   Decoder_2b_RTL-test.v \
   Register_4b_RTL-test.v \
-  RegfileStruct1r1w_4x4b_RTL-test.v \
-  RegfileFlat1r1w_4x4b_RTL-test.v \
+  Regfile1r1w_4x4b_struct_RTL-test.v \
+  Regfile1r1w_4x4b_flat_RTL-test.v \
 
 $(eval $(call check_part,mem))
